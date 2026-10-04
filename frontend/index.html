@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The Blind Spot — AI-powered critical thinking companion that surfaces blind spots, assumptions, and conflicts in decision reasoning without deciding for you.">
+  <title>The Blind Spot — AI Critical Thinking Companion</title>
+  <link rel="icon" href="/static/images/logo.jpg" type="image/jpeg">
+
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Accessibility Skip Link -->
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <!-- Site Header -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="/static/images/logo.jpg" alt="The Blind Spot logo" class="brand-icon" width="40" height="40">
+        <div class="brand-text">
+          <h1>The Blind Spot</h1>
+          <p>AI Critical Thinking Companion</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div id="backendStatusBadge" class="status-indicator-badge" aria-live="polite">
+          🟡 Initializing Engine...
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="settingsBtn" aria-label="Open settings and API configuration">
+          ⚙️ Settings
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Non-Negotiable Core Principle Hero Banner -->
+    <aside class="hero-companion" role="complementary" aria-label="Core Product Principle">
+      <div class="hero-tag">Cognitive Audit & Blind-Spot Companion</div>
+      <h2>See what you may have missed in your decision.</h2>
+      <p>
+        People naturally anchor their decisions on whatever information is most visible — immediate stipend, location, or brand names. 
+        <strong>The Blind Spot</strong> analyzes your reasoning to uncover unstated assumptions, second-order costs, and internal tensions.
+        It will <em>never</em> tell you which option to choose. The final judgment remains completely yours.
+      </p>
+      <div class="hero-pillars">
+        <span class="pillar-chip">🛡️ <strong>Thinking Companion</strong> (Never decides for you)</span>
+        <span class="pillar-chip">🧩 <strong>Assumption Stress-Tester</strong></span>
+        <span class="pillar-chip">⚡ <strong>Priority Collision Radar</strong></span>
+        <span class="pillar-chip">❓ <strong>Reflective Probing Questions</strong></span>
+      </div>
+    </aside>
+
+    <!-- Preloaded Benchmark Scenarios -->
+    <section class="scenarios-section" aria-label="Preloaded Decision Scenarios">
+      <div class="scenarios-header">
+        <h3>Sample Scenarios (One-Click Benchmark Tests)</h3>
+        <span style="font-size:0.75rem; color:var(--text-muted);">Select any scenario to evaluate</span>
+      </div>
+      <div class="scenarios-scroll" id="scenariosContainer" role="region" aria-label="Scenario presets carousel">
+        <!-- Rendered dynamically by scenarios.js -->
+      </div>
+    </section>
+
+    <!-- Main Workspace Layout -->
+    <main id="mainContent" class="main-layout" role="main">
+      <!-- Input Panel -->
+      <section class="input-panel" aria-label="Decision Input Form">
+        <div class="input-panel-header">
+          <h2>Examine Your Reasoning</h2>
+          <p class="panel-desc">State the decision you are weighing and explain what factors currently feel most convincing.</p>
+        </div>
+
+        <form id="decisionForm" novalidate>
+          <!-- Accessible Inline Error Alert (Replaces browser alert dialog) -->
+          <div id="inlineErrorAlert" class="inline-error-alert" role="alert" aria-live="assertive">
+            <div class="inline-error-icon" aria-hidden="true">⚠️</div>
+            <div class="inline-error-content">
+              <div class="inline-error-title" id="inlineErrorTitle">Let's add a little more context</div>
+              <div class="inline-error-msg" id="inlineErrorMessage">Please enter the decision or situation you are considering (at least 3 characters).</div>
+            </div>
+            <button type="button" class="inline-error-close" id="inlineErrorClose" aria-label="Dismiss error notification">&times;</button>
+          </div>
+
+          <div class="form-group">
+            <label for="decisionInput">
+              1. The Decision or Situation Under Consideration
+              <span class="label-hint">(Required)</span>
+            </label>
+            <input 
+              type="text" 
+              id="decisionInput" 
+              class="form-control" 
+              placeholder="e.g. Should I accept a 6-month software development internship?"
+              required
+              aria-required="true"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="reasoningInput">
+              2. Your Current Reasoning & What Seems Most Visible
+              <span class="label-hint">(Required, minimum 10 characters)</span>
+            </label>
+            <textarea 
+              id="reasoningInput" 
+              class="form-control" 
+              rows="4" 
+              placeholder="e.g. I am mainly considering it because the stipend is very good (40k/month), the company is only 15 minutes away from home, and it gives me industry experience on my resume..."
+              required
+              aria-required="true"
+            ></textarea>
+          </div>
+
+          <!-- Collapsible Advanced Context -->
+          <button 
+            type="button" 
+            class="accordion-toggle" 
+            id="accordionToggle" 
+            aria-expanded="false" 
+            aria-controls="advancedContext"
+          >
+            <span>+ Add priorities, constraints & options</span>
+          </button>
+
+          <div class="accordion-content" id="advancedContext">
+            <div class="form-group">
+              <label for="prioritiesInput">
+                Stated Goals & Top Priorities
+                <span class="label-hint">(Optional)</span>
+              </label>
+              <textarea 
+                id="prioritiesInput" 
+                class="form-control" 
+                rows="2" 
+                placeholder="e.g. Graduate with an 8.5+ GPA, build genuine deep software skills, minimize family financial stress..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="constraintsInput">
+                Constraints, Deadlines & Context
+                <span class="label-hint">(Optional)</span>
+              </label>
+              <textarea 
+                id="constraintsInput" 
+                class="form-control" 
+                rows="2" 
+                placeholder="e.g. College requires 75% attendance for 5 subjects; working hours are 9:30 AM - 6:00 PM; semester midterms in 2 months..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="optionsInput">
+                Specific Options Considered
+                <span class="label-hint">(One per line, optional)</span>
+              </label>
+              <textarea 
+                id="optionsInput" 
+                class="form-control" 
+                rows="2" 
+                placeholder="Accept the 6-month internship&#10;Decline and focus on coursework & open-source projects&#10;Negotiate for part-time (20 hours/week)"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="analyzeBtn">
+              <span>Analyze My Reasoning</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="clearBtn">
+              <span>Clear</span>
+            </button>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.75rem; text-align:center;">
+            Tip: Press <kbd style="background:var(--bg-tertiary); padding:2px 5px; border-radius:3px;">Ctrl</kbd> + <kbd style="background:var(--bg-tertiary); padding:2px 5px; border-radius:3px;">Enter</kbd> to analyze anytime.
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Workspace -->
+      <section class="results-panel" aria-label="Analysis Results Workspace" aria-live="polite">
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state-icon" aria-hidden="true">🔭</div>
+          <h3>Ready for Reflection</h3>
+          <p>
+            Enter your decision and rationale on the left, or choose a sample scenario from above.
+            The AI companion will systematically analyze what is visible versus what may be hidden.
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="loading-step-text" id="loadingStepText">Deconstructing explicit statements vs inferences...</div>
+          <div class="loading-subtext">The AI companion is dissecting assumptions, tensions, and trade-offs...</div>
+        </div>
+
+        <!-- Results Content Container -->
+        <div class="results-content" id="resultsContent">
+          <!-- Summary Header -->
+          <div class="results-header-card">
+            <div class="decision-badge-title">
+              <h3 id="resultDecisionTitle">Decision Summary</h3>
+              <p id="resultEngineBadge">Google Gemini (gemini-3.8-flash)</p>
+            </div>
+            <div class="results-tools">
+              <button type="button" class="btn btn-outline btn-sm" id="exportMdBtn" title="Export as Markdown report">
+                📥 Export MD
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="exportJsonBtn" title="Export raw JSON">
+                💾 JSON
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="printBtn" title="Print friendly audit report">
+                🖨️ Print
+              </button>
+            </div>
+          </div>
+
+          <!-- Section Filters / Tabs -->
+          <nav class="analysis-filters" aria-label="Analysis section filters">
+            <button type="button" class="filter-btn active" data-filter="all">All Dimensions</button>
+            <button type="button" class="filter-btn" data-filter="visible">👁️ Visible Anchors</button>
+            <button type="button" class="filter-btn" data-filter="blindspots">🕶️ Blind Spots</button>
+            <button type="button" class="filter-btn" data-filter="assumptions">🧩 Assumptions</button>
+            <button type="button" class="filter-btn" data-filter="tensions">⚡ Tensions & Trade-offs</button>
+            <button type="button" class="filter-btn" data-filter="questions">❓ Reflective Questions</button>
+          </nav>
+
+          <!-- Section 1: What I Understand -->
+          <article class="section-card" id="sec-understanding">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">📋</span>
+                <div>
+                  <h3>1. What I Understand</h3>
+                  <p>Distinguishing verifiable facts explicitly stated from contextual inferences</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="understandingList"></div>
+          </article>
+
+          <!-- Section 2: Most Visible Factors (Cognitive Anchors) -->
+          <article class="section-card" id="sec-visible">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">👁️</span>
+                <div>
+                  <h3>2. What Seems Most Visible in Your Reasoning</h3>
+                  <p>Salient factors taking up disproportionate cognitive real estate (Anchoring Effect)</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="visibleFactorsList"></div>
+          </article>
+
+          <!-- Section 3: Potential Blind Spots -->
+          <article class="section-card" id="sec-blindspots">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">🕶️</span>
+                <div>
+                  <h3>3. Potential Blind Spots</h3>
+                  <p>Important unseen dimensions, second-order effects, and opportunity costs</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="blindSpotsList"></div>
+          </article>
+
+          <!-- Section 4: Assumptions to Examine (Interactive Stress-Tester) -->
+          <article class="section-card" id="sec-assumptions">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">🧩</span>
+                <div>
+                  <h3>4. Assumptions to Examine (Interactive Stress-Tester)</h3>
+                  <p>Unstated beliefs: What condition must hold for each assumption to be true?</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="assumptionsList"></div>
+          </article>
+
+          <!-- Section 5: Overlooked Factors -->
+          <article class="section-card" id="sec-overlooked">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">🔍</span>
+                <div>
+                  <h3>5. Overlooked Factors</h3>
+                  <p>Tangible constraints, academic impacts, and long-term consequences</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="overlookedList"></div>
+          </article>
+
+          <!-- Section 6: Conflicts & Tensions -->
+          <article class="section-card" id="sec-conflicts">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">⚡</span>
+                <div>
+                  <h3>6. Possible Conflicts or Tensions in Reasoning</h3>
+                  <p>Internal friction where stated priorities collide with practical reality</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="conflictsList"></div>
+          </article>
+
+          <!-- Section 7: Trade-offs -->
+          <article class="section-card" id="sec-tradeoffs">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">⚖️</span>
+                <div>
+                  <h3>7. Trade-offs</h3>
+                  <p>Explicitly acknowledging what is sacrificed in exchange for what is gained</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="tradeOffsList"></div>
+          </article>
+
+          <!-- Section 8: Missing Information Checklist -->
+          <article class="section-card" id="sec-missing">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">📝</span>
+                <div>
+                  <h3>8. Missing Information (Actionable Verification Checklist)</h3>
+                  <p>Critical evidence to gather before committing to a decision</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="missingInfoList"></div>
+          </article>
+
+          <!-- Section 9: Alternative Perspectives -->
+          <article class="section-card" id="sec-perspectives">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">🔮</span>
+                <div>
+                  <h3>9. Alternative Perspectives</h3>
+                  <p>Viewing the situation through different mental models and time horizons</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="perspectivesList"></div>
+          </article>
+
+          <!-- Section 10: Questions to Consider & Deep Dive Reflection -->
+          <article class="section-card" id="sec-questions">
+            <header class="section-card-header">
+              <div class="section-title-wrap">
+                <span class="section-icon" aria-hidden="true">❓</span>
+                <div>
+                  <h3>10. Questions to Consider (With Interactive Deep Dive)</h3>
+                  <p>Reflective, non-leading questions to provoke deeper self-examination</p>
+                </div>
+              </div>
+            </header>
+            <div class="insights-grid" id="questionsList"></div>
+          </article>
+
+          <!-- Final Decision & Synthesis Notebook (User Controlled) -->
+          <section class="decision-notebook" aria-label="User's Final Decision Synthesis">
+            <div class="decision-notebook-header">
+              <span style="font-size:1.6rem;" aria-hidden="true">✍️</span>
+              <div>
+                <h3>Your Personal Reflection & Decision Notebook</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary);">
+                  The AI has finished surfacing blind spots. The conclusion belongs solely to you.
+                </p>
+              </div>
+            </div>
+
+            <div class="decision-ownership-callout" id="ownershipStatement">
+              The AI companion provides analysis to support critical thinking only. It does not recommend or choose any option. The final judgment and decision remain entirely yours.
+            </div>
+
+            <div class="form-group">
+              <label for="userSynthesisNotes">
+                Your Synthesis & Notes: What blind spots or tensions mattered most?
+              </label>
+              <textarea 
+                id="userSynthesisNotes" 
+                class="form-control" 
+                rows="3" 
+                placeholder="After examining the assumptions, I realize that I assumed mentorship would be high without verifying..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="userDecisionText">
+                Your Decision: What do you choose to do, and why?
+              </label>
+              <textarea 
+                id="userDecisionText" 
+                class="form-control" 
+                rows="2" 
+                placeholder="I will reach out to past interns this week to verify mentorship and ask college for an attendance waiver before deciding..."
+              ></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1rem;">
+              <button type="button" class="btn btn-primary" onclick="exportMarkdown()">
+                <span>Save & Export My Complete Decision Audit</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="settingsModalTitle" style="font-size:1.15rem; font-weight:700;">Settings & Google Gemini Configuration</h3>
+        <button type="button" class="modal-close" id="closeSettingsBtn" aria-label="Close settings modal">&times;</button>
+      </div>
+      <div style="font-size:0.85rem; color:var(--text-secondary); line-height:1.5; margin-bottom:1.25rem;">
+        The system automatically uses <strong>gemini-3.8-flash</strong> via official Google GenAI integration when <code>GEMINI_API_KEY</code> is set in your server environment.
+        You can also provide a runtime key below (stored safely in browser <code>sessionStorage</code> only).
+      </div>
+
+      <div class="form-group">
+        <label for="modalGeminiKeyInput">Custom Gemini API Key</label>
+        <input 
+          type="password" 
+          id="modalGeminiKeyInput" 
+          class="form-control" 
+          placeholder="AIzaSy..."
+          autocomplete="off"
+        >
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem;">
+          Your key remains in your local browser session and is never logged or written to disk.
+        </p>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeAllModals()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>
+        <strong>The Blind Spot</strong> — Built for PromptWars 2026 Challenge. Powered by Google Gemini.
+      </p>
+      <p style="font-size:0.78rem; margin-top:0.35rem; color:var(--text-muted);">
+        A Thinking Companion, Not a Decision Maker. Helping users examine assumptions and see what was missed.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/static/js/scenarios.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
