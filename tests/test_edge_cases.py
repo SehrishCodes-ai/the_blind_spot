@@ -102,3 +102,29 @@ def test_no_decision_made_adversarial_queries():
         forbidden = ["i recommend you accept", "you should choose option a", "my verdict is", "the correct choice is"]
         for f in forbidden:
             assert f not in statement
+
+
+def test_meaningless_input_rejected_before_gemini_call():
+    """Server-side validation must reject meaningless text before analysis is invoked."""
+    invalid_payloads = [
+        {"decision": "123456", "reasoning": "1234567890"},
+        {"decision": "!!!???!!!", "reasoning": "!!!???!!!!!!!"},
+        {"decision": "aaaaaa", "reasoning": "bbbbbbbbbb"},
+    ]
+
+    with patch("backend.app.analyze_decision_reasoning") as mock_analyze:
+        for payload in invalid_payloads:
+            response = client.post("/api/analyze", json=payload)
+            assert response.status_code == 400
+
+        mock_analyze.assert_not_called()
+
+
+def test_mixed_numeric_text_input_is_accepted():
+    """Legitimate numeric/text combinations must remain usable."""
+    payload = {
+        "decision": "Should I accept the 6-month internship?",
+        "reasoning": "The ₹15,000 stipend and 3 days/week schedule are attractive, but I need to check my 85% attendance requirement.",
+    }
+    response = client.post("/api/analyze", json=payload)
+    assert response.status_code == 200

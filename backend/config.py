@@ -16,6 +16,14 @@ class Settings:
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "") or os.getenv("GOOGLE_API_KEY", "")
     DEFAULT_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
     FALLBACK_MODEL: str = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-2.5-flash")
+
+    # CORS origins can be restricted for deployment. Comma-separated values are supported.
+    # Wildcard is credential-free and is convenient for local development.
+    ALLOWED_ORIGINS: list[str] = [
+        origin.strip()
+        for origin in os.getenv("ALLOWED_ORIGINS", "*").split(",")
+        if origin.strip()
+    ] or ["*"]
     
     # Request limits for safety and efficiency
     MAX_DECISION_LENGTH: int = 500

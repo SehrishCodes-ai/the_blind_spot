@@ -434,7 +434,7 @@
       </div>
       <div style="font-size:0.85rem; color:var(--text-secondary); line-height:1.5; margin-bottom:1.25rem;">
         The system automatically uses <strong>gemini-3.8-flash</strong> via official Google GenAI integration when <code>GEMINI_API_KEY</code> is set in your server environment.
-        You can also provide a runtime key below (stored safely in browser <code>sessionStorage</code> only).
+        You can also provide an optional developer runtime key below (held only in this browser session). For deployed use, server-side <code>GEMINI_API_KEY</code> configuration is preferred.
       </div>
 
       <div class="form-group">
@@ -447,7 +447,7 @@
           autocomplete="off"
         >
         <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem;">
-          Your key remains in your local browser session and is never logged or written to disk.
+          The key remains only in this browser session and is never logged or written to disk. Do not use this field for shared or production credential storage.
         </p>
       </div>
 

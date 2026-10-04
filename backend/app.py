@@ -4,6 +4,7 @@ Exposes REST endpoints for critical-thinking analysis, scenarios, and deep dive 
 and serves the static web UI.
 """
 import os
+import re
 import logging
 from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, HTTPException, Request, Header, status
@@ -35,13 +36,14 @@ app = FastAPI(
     description="AI Critical Thinking Companion that surfaces blind spots, assumptions, and tensions without deciding for the user."
 )
 
-# Enable CORS for local development and testing
+# CORS is configurable for deployment. The default wildcard is intentionally
+# credential-free so local development works without opening credentialed CORS.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "x-gemini-api-key"],
 )
 
 
@@ -116,25 +118,25 @@ def analyze_reasoning(
     Analyze user decision reasoning to surface blind spots, assumptions,
     trade-offs, overlooked factors, and reflective questions.
     """
-    if not payload.decision.strip() or len(payload.decision.strip()) < 3:
+    def has_meaningful_text(value: str, minimum_letters: int = 1) -> bool:
+        """Reject symbol/number-only and obvious repeated-character input."""
+        letters = re.findall(r"[^\W\d_]", value, flags=re.UNICODE)
+        if len(letters) < minimum_letters:
+            return False
+        normalized = "".join(letters).lower()
+        if len(normalized) >= 6 and len(set(normalized)) == 1:
+            return False
+        return True
+
+    if not has_meaningful_text(payload.decision):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The decision statement must be at least 3 characters long."
+            detail="The decision statement must contain meaningful text, not only numbers, symbols, or repetitive characters."
         )
-    if not re.search(r'\p{L}', payload.decision, re.UNICODE) if False else not re.search(r'[^\W\d_]', payload.decision, re.UNICODE):
+    if not has_meaningful_text(payload.reasoning, minimum_letters=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The decision statement must contain at least some text (not only numbers or symbols)."
-        )
-    if not payload.reasoning.strip() or len(payload.reasoning.strip()) < 10:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Please provide at least 10 characters explaining your current reasoning."
-        )
-    if not re.search(r'[^\W\d_]', payload.reasoning, re.UNICODE):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The reasoning must contain at least some text (not only numbers or symbols)."
+            detail="The reasoning must contain meaningful text, not only numbers, symbols, or repetitive characters."
         )
 
     # Perform analysis

@@ -120,19 +120,19 @@ Google Gemini acts as the core analytical engine in `backend/gemini_service.py`:
 
 1. **Zero Hardcoded Secrets**: No API keys or credentials exist in source code.
 2. **Environment Variable Configuration**: Uses `GEMINI_API_KEY` from `.env` or system environment.
-3. **Safe Runtime Key Storage**: Optional user keys entered in the UI are held only in browser `sessionStorage`, transmitted over secure headers (`x-gemini-api-key`), and never logged or written to disk.
+3. **Optional Runtime Key**: A user-entered runtime key is supported as a developer convenience and is held only in browser `sessionStorage`; it is transmitted only in the `x-gemini-api-key` request header and is never logged or written to disk. For deployed production use, server-side `GEMINI_API_KEY` configuration is preferred.
 4. **Input Sanitization**: Pydantic models validate and constrain string lengths (`max_length=4000`) and enforce minimum valid bounds.
 5. **Safe Error Handling**: Custom global exception handlers prevent stack traces or internal server paths from leaking to clients.
 6. **Git Protection**: `.gitignore` comprehensively ignores `.env`, cache directories, test artifacts, and logs.
 
 ---
 
-## 8. Accessibility (WCAG 2.1 AA Compliant)
+## 8. Accessibility Considerations
 
 - **Semantic HTML5 Elements**: Uses `<header>`, `<main>`, `<section>`, `<article>`, `<nav>`, and `<footer>`.
 - **Keyboard Navigation**: Full keyboard accessibility, including a top Skip Link, visible `:focus-visible` styling rings, and shortcuts (`Ctrl+Enter` to analyze, `Esc` to dismiss modals).
 - **ARIA Attributes**: `aria-live="polite"` on results workspace, `aria-expanded` on context accordions, and `aria-label` on buttons.
-- **High-Contrast Palette**: Text meets and exceeds contrast ratio thresholds (4.5:1 for normal text, 7:1 for headers).
+- **High-Contrast Palette**: The interface is designed with strong text/background contrast; formal WCAG conformance is not claimed.
 - **Responsive Layout**: Fluid breakpoints optimized for Mobile (<640px), Tablet (640px-1024px), and Desktop (>1024px).
 
 ---
@@ -223,6 +223,7 @@ python -m pytest tests/ -v
 | `PORT` | Port number for backend server | `8000` |
 | `GEMINI_MODEL` | Primary Gemini model identifier | `gemini-3.8-flash` |
 | `GEMINI_FALLBACK_MODEL` | Fallback Gemini model identifier | `gemini-2.5-flash` |
+| `ALLOWED_ORIGINS` | Comma-separated CORS origins for deployed API access | `*` (credential-free local development) |
 
 ---
 
@@ -254,9 +255,9 @@ gcloud run deploy the-blind-spot \
 ## 13. PromptWars Final Criteria Compliance Audit
 
 - [x] **CODE QUALITY**: Modular separation of concerns (`backend/`, `frontend/`, `tests/`), clean Pydantic typing, zero dead code, focused functions.
-- [x] **SECURITY**: Zero hardcoded credentials, input validation, safe headers, `.env` git-ignored, no stack trace exposure.
+- [x] **SECURITY**: Zero hardcoded credentials, server-side input validation, configurable credential-free CORS, `.env` git-ignored, no stack trace exposure.
 - [x] **EFFICIENCY**: Single targeted inference call per analysis, client-side session caching, minimal dependency footprint.
-- [x] **TESTING**: 24 automated tests covering standard inputs, edge cases, API outages, schema boundaries, and adversarial attempts.
+- [x] **TESTING**: 29 automated tests covering standard inputs, edge cases, API outages, schema boundaries, responsive UI, and adversarial attempts.
 - [x] **ACCESSIBILITY**: Semantic HTML5, keyboard shortcuts, visible focus indicators, screen-reader landmarks, responsive across mobile/tablet/desktop.
 - [x] **PROBLEM STATEMENT ALIGNMENT**: Direct implementation of the thinking companion principle; official internship benchmark fully solved.
 - [x] **GOOGLE SERVICES USAGE**: Meaningful, deep integration with Google Gemini (`gemini-3.8-flash`) via the modern `google-genai` SDK with structured schema generation.
